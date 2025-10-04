@@ -6,29 +6,56 @@
 <title>Dashboard</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
+/* ========== Global Styles ========== */
 body { font-family: 'Poppins', sans-serif; margin:0; background:#fffdfb; color:#222; }
+
+/* ========== Sidebar ========== */
 .sidebar { width:220px; height:100vh; position:fixed; background:#fafafa; padding-top:30px; box-shadow:5px 0 20px rgba(0,0,0,0.1); text-align:center; z-index:999; }
 .sidebar img { width:140px; height:auto; margin-bottom:25px; }
 .sidebar a { display:flex; align-items:center; gap:12px; padding:14px 20px; color:#ff7f50; text-decoration:none; margin:6px 0; font-weight:500; border-radius:0 25px 25px 0; transition:all 0.3s; }
+.sidebar a i { font-size:18px; }
 .sidebar a:hover { background:#ff7f5020; transform:translateX(6px); }
+
+/* ========== Main Content ========== */
 .main { margin-left:220px; padding:30px; transition:margin-left 0.3s; }
+
+/* ========== Cards ========== */
 .card-container { display:flex; gap:20px; flex-wrap:wrap; margin-bottom:20px; }
 .card { background:#fff; padding:25px; border-radius:16px; box-shadow:0 8px 20px rgba(255,127,80,0.15); position:relative; flex:1; min-width:280px; }
+.card::before { content:""; position:absolute; top:0; left:0; width:100%; height:4px; background:#ff7f50; border-radius:16px 16px 0 0; }
 .card h2 { color:#ff7f50; margin-bottom:14px; font-size:20px; }
+
+/* ========== Buttons ========== */
 .btn, input[type="submit"], button { display:inline-block; margin-top:10px; padding:10px 22px; background:#ff7f50; color:white; border:none; border-radius:50px; font-weight:500; cursor:pointer; transition:0.3s; text-decoration:none; }
-.btn:hover, input[type="submit"]:hover, button:hover { background:#e06b3f; }
-input[type="file"], input[type="text"], select { margin:10px 0; width:100%; padding:12px; border-radius:10px; border:1px solid #ff7f50; font-size:14px; }
+.btn:hover, input[type="submit"]:hover, button:hover { background:#e06b3f; box-shadow:0 6px 18px rgba(255,127,80,0.35); transform:translateY(-2px); }
+
+/* ========== Inputs ========== */
+input[type="file"], input[type="text"], select { margin:10px 0; width:100%; padding:12px; border-radius:10px; border:1px solid #ff7f50; font-size:14px; transition:0.3s; }
+input:focus, select:focus { border-color:#ff7f50; box-shadow:0 0 10px rgba(255,127,80,0.25); outline:none; }
+
+/* ========== Table ========== */
 .table-responsive { width:100%; overflow-x:auto; margin-top:15px; }
 .table-responsive table { width:100%; border-collapse:collapse; min-width:600px; border-radius:10px; overflow:hidden; box-shadow:0 4px 12px rgba(255,127,80,0.08); }
 th, td { padding:10px; text-align:left; font-size:14px; border-bottom:1px solid #eee; }
 th { background:#ff7f50; color:white; }
 tr:nth-child(even) { background:#fff7f2; }
+
+/* ========== Pagination ========== */
 .pagination { margin-top:18px; }
-.pagination a { margin-right:8px; padding:7px 14px; background:#ff7f50; color:white; border-radius:30px; text-decoration:none; }
-.pagination a:hover { background:#e06b3f; }
-.logout-btn { padding:8px 18px; background:#ff7f50; color:white; border-radius:50px; text-decoration:none; font-weight:500; }
-.logout-btn:hover { background:#e06b3f; }
-.alert { padding:10px; border-radius:8px; margin-bottom:15px; background:#e0f3ff; color:#005b8a; }
+.pagination a { margin-right:8px; padding:7px 14px; background:#ff7f50; color:white; border-radius:30px; text-decoration:none; transition:0.3s; }
+.pagination a:hover { background:#e06b3f; box-shadow:0 5px 12px rgba(255,127,80,0.3); }
+
+/* ========== Logout Button ========== */
+.logout-btn { padding:8px 18px; background:#ff7f50; color:white; border-radius:50px; text-decoration:none; font-weight:500; transition:0.3s; }
+.logout-btn:hover { background:#e06b3f; transform:translateY(-2px); }
+
+/* ========== Alerts ========== */
+.alert { padding:10px; border-radius:8px; margin-bottom:15px; }
+.alert-info { background:#e0f3ff; color:#005b8a; }
+
+/* ========== Responsive Design ========== */
+@media(max-width:480px) { .card h2{font-size:18px;} th,td{font-size:12px;padding:6px;} .card-container{flex-direction:column;} }
+
 </style>
 </head>
 <body>
@@ -48,12 +75,14 @@ tr:nth-child(even) { background:#fff7f2; }
 
     {% with messages = get_flashed_messages() %}
     {% if messages %}
-    <div class="alert">
+    <div class="alert alert-info">
         {% for msg in messages %}<div>{{ msg }}</div>{% endfor %}
     </div>
     {% endif %}
     {% endwith %}
 
+
+    <!-- Upload + Search -->
     <div class="card-container">
         {% if role=="admin" %}
         <div class="card">
@@ -64,8 +93,6 @@ tr:nth-child(even) { background:#fff7f2; }
             </form>
         </div>
         {% endif %}
-
-        
 
         <div class="card" style="flex:2;">
             <h2>Search Data</h2>
@@ -82,6 +109,8 @@ tr:nth-child(even) { background:#fff7f2; }
         </div>
     </div>
 
+    
+    <!-- Rows per page -->
     {% if rows %}
     <div class="card" style="margin-top:10px;">
         <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center;">
@@ -89,37 +118,74 @@ tr:nth-child(even) { background:#fff7f2; }
             <a href="{{ url_for('download', search=search_query, selected_file=selected_file) }}" class="btn">Download Filtered Excel</a>
         </div>
 
-        <form method="POST" action="{{ url_for('delete_rows') }}">
-            <input type="hidden" name="selected_file" value="{{ selected_file }}">
-            <div class="table-responsive">
-                <table id="editableTable">
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="select_all"></th>
-                            {% for col in columns %}<th>{{ col }}</th>{% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in rows %}
-                        <tr>
-                            <td><input type="checkbox" name="delete_checkbox" value="{{ row['_id'] }}"></td>
-                            {% for col in columns %}
-                            <td contenteditable="true" data-id="{{ row['_id'] }}" data-col="{{ col }}">{{ row[col] }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <button type="submit" class="btn" style="margin-top:10px; background:#ff4d4d;">Delete Selected Rows</button>
-        </form>
-
-        <div id="tableCounts" style="padding:8px; font-weight:600;">
-            <span id="totalCount">Total rows: {{ total_count_all }}</span> ·
-            <span id="visibleCount">Visible rows: 0</span> ·
-            <span id="checkedCount">Checked: 0</span>
+        <div style="margin-top:10px;">
+            Rows per page:
+            <form method="GET" style="display:inline;">
+                <input type="hidden" name="search" value="{{ search_query }}">
+                <input type="hidden" name="selected_file" value="{{ selected_file }}">
+                <select name="page_size" onchange="this.form.submit()">
+                    {% for n in [10,25,50,75,100] %}
+                    <option value="{{ n }}" {% if page_size==n %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+            </form>
         </div>
 
+       <form method="POST" action="{{ url_for('delete_rows') }}">
+    <input type="hidden" name="selected_file" value="{{ selected_file }}">
+    <div class="table-responsive">
+        <table id="editableTable">
+            <thead>
+                <tr>
+                    <th>
+                        <input type="checkbox" id="select_all">
+                    </th>
+                    {% for col in columns %}
+                        <th>{{ col }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                <tr>
+                    <td>
+                        <input type="checkbox" name="delete_checkbox" value="{{ row['_id'] }}">
+                    </td>
+                    {% for col in columns %}
+                    <td contenteditable="true"
+                        data-id="{{ row['_id'] }}"
+                        data-col="{{ col }}">
+                        {{ row[col] }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <button type="submit" class="btn" style="margin-top:10px; background:#ff4d4d; color:white; padding:8px 15px; border:none; border-radius:5px; cursor:pointer;">
+        Delete Selected Rows
+    </button>
+</form>
+
+<!-- ✅ Select All Script -->
+<script>
+    const selectAllCheckbox = document.getElementById("select_all");
+    const checkboxes = document.querySelectorAll('input[name="delete_checkbox"]');
+
+    selectAllCheckbox.addEventListener("change", function() {
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+</script>
+
+        <!-- place this directly after your table markup -->
+<div id="tableCounts" style="padding:8px; font-weight:600;">
+  <span id="totalCount">Total rows: {{total_count_all}}</span> ·
+  <span id="visibleCount">Visible rows: 0</span> ·
+  <span id="checkedCount">Checked: 0</span>
+</div>
+
+        <!-- Pagination -->
         <div class="pagination">
             {% if page>1 %}
             <a href="{{ url_for('dashboard', search=search_query, page=1, page_size=page_size, selected_file=selected_file) }}">First</a>
@@ -140,44 +206,189 @@ tr:nth-child(even) { background:#fff7f2; }
 
 </div>
 
-
-
 <script>
-// Select all checkboxes
-const selectAll = document.getElementById("select_all");
-const checkboxes = document.querySelectorAll('input[name="delete_checkbox"]');
-selectAll?.addEventListener("change", () => checkboxes.forEach(cb => cb.checked = selectAll.checked));
+document.addEventListener("DOMContentLoaded", function () {
+    // ✅ Select All checkbox
+    const selectAll = document.getElementById("select_all");
+    const checkboxes = document.querySelectorAll("input[name='delete_checkbox']");
+    if (selectAll) {
+        selectAll.addEventListener("change", function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+    }
 
-// Update counts
-function updateCounts() {
-    const visible = Array.from(document.querySelectorAll("#editableTable tbody tr")).filter(r => r.offsetParent !== null).length;
-    const checked = document.querySelectorAll("#editableTable tbody input[name='delete_checkbox']:checked").length;
-    document.getElementById("visibleCount").textContent = 'Visible rows: ' + visible;
-    document.getElementById("checkedCount").textContent = 'Checked: ' + checked;
-}
-document.querySelectorAll("#editableTable tbody input[name='delete_checkbox']").forEach(cb => cb.addEventListener('change', updateCounts));
-selectAll?.addEventListener('change', updateCounts);
-updateCounts();
+    // ✅ Auto-save function
+    function saveCell(cell) {
+        let rowId = cell.getAttribute("data-id");
+        let colName = cell.getAttribute("data-col");
+        let newValue = cell.innerText.trim();
 
-// Editable table save
-function saveCell(cell) {
-    const rowId = cell.dataset.id;
-    const col = cell.dataset.col;
-    const value = cell.innerText.trim();
-    fetch("/update_cell", {
-        method: "POST",
-        headers: {"Content-Type":"application/json"},
-        body: JSON.stringify({id: rowId, column: col, value: value})
-    })
-    .then(res => res.json())
-    .then(resp => { cell.style.backgroundColor = "#d4edda"; setTimeout(()=>cell.style.backgroundColor="",1500); })
-    .catch(err => { cell.style.backgroundColor = "#f8d7da"; setTimeout(()=>cell.style.backgroundColor="",2000); });
-}
-document.querySelectorAll("#editableTable td[contenteditable='true']").forEach(cell => {
-    cell.addEventListener("blur", () => saveCell(cell));
-    cell.addEventListener("keydown", e => { if(e.key==="Enter"){ e.preventDefault(); cell.blur(); }});
+        fetch("/update_cell", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                id: rowId,
+                column: colName,
+                value: newValue
+            })
+        })
+        .then(res => res.json())
+        .then(resp => {
+            console.log(resp.message);
+            cell.style.backgroundColor = "#d4edda";  // green highlight
+            setTimeout(() => cell.style.backgroundColor = "", 1500);
+        })
+        .catch(err => {
+            console.error("Error:", err);
+            cell.style.backgroundColor = "#f8d7da";  // red highlight
+            setTimeout(() => cell.style.backgroundColor = "", 2000);
+        });
+    }
+
+    // ✅ Attach events to editable cells
+    document.querySelectorAll("#editableTable td[contenteditable='true']").forEach(cell => {
+        // Save on blur (existing behavior)
+        cell.addEventListener("blur", function () {
+            saveCell(this);
+        });
+
+        // Save on Enter (new behavior)
+        cell.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                e.preventDefault(); // prevents line break
+                this.blur();        // triggers blur → saveCell()
+            }
+        });
+    });
 });
+
+// Enable sorting when clicking the header (or you can modify for dropdowns if you add them)
+document.addEventListener("DOMContentLoaded", function () {
+    const table = document.getElementById('editableTable');
+    if (!table) return;
+
+    const getCellValue = (row, idx) =>
+        row.children[idx].innerText || row.children[idx].textContent;
+
+    const comparer = (idx, asc) => (a, b) => {
+        const v1 = getCellValue(a, idx);
+        const v2 = getCellValue(b, idx);
+        // Numeric sort if possible, otherwise string sort
+        const num1 = parseFloat(v1.replace(/,/g, ''));
+        const num2 = parseFloat(v2.replace(/,/g, ''));
+        if (!isNaN(num1) && !isNaN(num2)) {
+            return asc ? num1 - num2 : num2 - num1;
+        } else {
+            return asc
+                ? v1.toString().localeCompare(v2)
+                : v2.toString().localeCompare(v1);
+        }
+    };
+
+    // Helper to clear all sort arrows
+    function clearSortIndicators() {
+        table.querySelectorAll("th").forEach(th => {
+            th.innerHTML = th.textContent.replace(/[\u25B2\u25BC]/g, '').trim(); // Remove arrows
+        });
+    }
+
+    table.querySelectorAll("th:not(:first-child)").forEach((th, idx) => {
+        th.style.cursor = "pointer";
+        th.addEventListener("click", function () {
+            // Clear other arrows
+            clearSortIndicators();
+            // Toggle sort direction
+            const asc = !this.asc;
+            this.asc = asc;
+            // Sort rows
+            const tbody = table.querySelector("tbody");
+            Array.from(tbody.querySelectorAll("tr"))
+                .sort(comparer(idx, asc))
+                .forEach(tr => tbody.appendChild(tr));
+            // Add arrow to indicate direction
+            th.innerHTML = th.textContent.trim() + (asc ? " &#9650;" : " &#9660;");
+        });
+    });
+});
+
+(function () {
+  const table = document.getElementById('editableTable');
+  if (!table) return;
+
+  const tbody = table.querySelector('tbody');
+  const selectAll = document.getElementById('select_all');
+  const visibleCountEl = document.getElementById('visibleCount');
+  const checkedCountEl = document.getElementById('checkedCount');
+
+  function getRowElements() {
+    return Array.from(tbody.querySelectorAll('tr'));
+  }
+
+  function countChecked() {
+    return tbody.querySelectorAll('input[name="delete_checkbox"]:checked').length;
+  }
+
+  function countVisibleRows() {
+    // counts rows that are not display: none (visible)
+    return getRowElements().filter(r => r.offsetParent !== null).length;
+  }
+
+  function updateCounts() {
+    const visible = countVisibleRows();
+    const checked = countChecked();
+    visibleCountEl.textContent = 'Visible rows: ' + visible;
+    checkedCountEl.textContent = 'Checked: ' + checked;
+  }
+
+  // Update when any checkbox in tbody changes
+  tbody.addEventListener('change', function (e) {
+    const target = e.target;
+    if (target && target.matches('input[name="delete_checkbox"]')) {
+      updateCounts();
+    }
+  });
+
+  // Select all checkbox behavior (if you already have code for this, keep it; this will sync counts)
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      const checked = !!selectAll.checked;
+      tbody.querySelectorAll('input[name="delete_checkbox"]').forEach(cb => cb.checked = checked);
+      updateCounts();
+    });
+  }
+
+  // Detect additions/removals/attribute changes in tbody using MutationObserver
+  const mo = new MutationObserver(function (mutations) {
+    let shouldUpdate = false;
+    for (const m of mutations) {
+      if (m.type === 'childList' && (m.addedNodes.length || m.removedNodes.length)) {
+        shouldUpdate = true;
+        break;
+      }
+      if (m.type === 'attributes') {
+        shouldUpdate = true;
+        break;
+      }
+    }
+    if (shouldUpdate) updateCounts();
+  });
+
+  mo.observe(tbody, { childList: true, subtree: true, attributes: true });
+
+  // If contenteditable changes should be interpreted as structural changes, also listen for input events
+  tbody.addEventListener('input', function () {
+    // content edits usually don't change counts, but in case your app auto-adds/removes rows on edit
+    updateCounts();
+  });
+
+  // Initial populate
+  document.addEventListener('DOMContentLoaded', updateCounts);
+  // Also run immediately if script placed at bottom
+  updateCounts();
+})();
+
 </script>
+
 
 </body>
 </html>
