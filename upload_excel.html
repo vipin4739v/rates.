@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 30px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #6C63FF;
+            margin-bottom: 20px;
+        }
+
+        .flash {
+            color: red;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        input[type="file"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background: #6C63FF;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        input[type="submit"]:hover {
+            background: #5750d3;
+        }
+
+        a.logout {
+            display: inline-block;
+            margin-top: 15px;
+            color: #6C63FF;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        a.logout:hover {
+            text-decoration: underline;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background: #6C63FF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Welcome, {{ username }}!</h2>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div class="flash">{{ messages[0] }}</div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Admin upload section -->
+        {% if role == 'admin' %}
+        <h3>Upload Excel File</h3>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file" accept=".xlsx" required>
+            <input type="submit" value="Upload">
+        </form>
+        {% endif %}
+
+        <!-- Search section for all users -->
+        <h3>Search Data</h3>
+        <form method="GET">
+            <input type="text" name="search" placeholder="Search Name..." value="{{ search_query }}">
+            <input type="submit" value="Search">
+        </form>
+
+        <!-- Data preview table -->
+        {% if data_preview %}
+        <h3>Data Preview</h3>
+        {{ data_preview | safe }}
+
+        <div class="pagination">
+            {% if page > 1 %}
+            <a href="{{ url_for('dashboard', search=search_query, page=page-1) }}">Previous</a>
+            {% endif %}
+            {% if page < total_pages %} <a href="{{ url_for('dashboard', search=search_query, page=page+1) }}">Next</a>
+                {% endif %}
+                <span> Page {{ page }} of {{ total_pages }} </span>
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('logout') }}" class="logout">Logout</a>
+    </div>
+</body>
+
+</html>
